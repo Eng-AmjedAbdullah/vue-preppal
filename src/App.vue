@@ -13,12 +13,8 @@
     </div>
   </div>
 </template>
+
 <script>
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap-icons/font/bootstrap-icons.css';
-import 'swiper/swiper-bundle.css';
-import 'glightbox/dist/css/glightbox.min.css';
-import 'aos/dist/aos.css';
 import HeaderComponent from './components/HeaderComponent.vue';
 import FooterComponent from './components/FooterComponent.vue';
 
