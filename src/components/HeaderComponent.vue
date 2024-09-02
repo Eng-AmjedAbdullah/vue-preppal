@@ -55,7 +55,7 @@ import { ref, onMounted } from 'vue';
 import logo from '../assets/logo.png';
 
 const isLoggedIn = ref(false); // Placeholder for auth state
-const username = ref('John Doe'); // Placeholder username
+const username = ref('hayaa'); // Placeholder username
 const userImage = ref('https://via.placeholder.com/50'); // Placeholder image
 
 function logout() {
