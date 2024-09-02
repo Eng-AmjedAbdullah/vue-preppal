@@ -1,3 +1,67 @@
+
+
+<template>
+  <div class="container">
+    <div class="forms-container">
+      <div class="signin-signup">
+        <!-- Sign In Form -->
+        <form @submit.prevent="handleLogin" class="sign-in-form">
+          <h2 class="title">Sign in</h2>
+          <div class="input-field">
+            <i class="fas fa-envelope"></i>
+            <input type="email" v-model="loginEmail" placeholder="Email" required />
+          </div>
+          <div class="input-field">
+            <i class="fas fa-lock"></i>
+            <input type="password" v-model="loginPassword" placeholder="Password" required />
+          </div>
+          <div class="form-options">
+            <div class="remember-me">
+              <input type="checkbox" id="remember" />
+              <label for="remember">Remember Me</label>
+            </div>
+            <a href="#" class="forgot-password">Forgot Password?</a>
+          </div>
+          <input type="submit" value="Login" class="btn solid" />
+        </form>
+
+        <!-- Sign Up Form -->
+        <form @submit.prevent="handleRegister" class="sign-up-form">
+          <h2 class="title">Sign up</h2>
+          <div class="input-field">
+            <i class="fas fa-user"></i>
+            <input type="text" v-model="registerData.username" placeholder="Username" required />
+          </div>
+          <div class="input-field">
+            <i class="fas fa-envelope"></i>
+            <input type="email" v-model="registerData.email" placeholder="Email" required />
+          </div>
+          <div class="input-field">
+            <i class="fas fa-lock"></i>
+            <input type="password" v-model="registerData.password" placeholder="Password" required />
+          </div>
+          <div class="input-field">
+            <i class="fas fa-lock"></i>
+            <input type="password" v-model="registerData.confirmPassword" placeholder="Confirm Password" required />
+          </div>
+          <div class="input-field">
+            <i class="fas fa-calendar-alt"></i>
+            <input type="number" v-model="registerData.age" placeholder="Age" required min="4" max="100" />
+          </div>
+          <div class="input-field" v-if="isChild">
+            <i class="fas fa-envelope"></i>
+            <input type="email" v-model="registerData.parentEmail" placeholder="Parent's Email" required />
+          </div>
+          <input type="submit" class="btn" value="Sign up" />
+        </form>
+      </div>
+    </div>
+
+    <div class="panels-container">
+      <!-- Panels for animations -->
+    </div>
+  </div>
+</template>
 <script>
 // Import Firebase and Firestore
 import { auth } from '../firebase'; // Correct import for Firebase configuration
@@ -94,70 +158,6 @@ export default {
   }
 };
 </script>
-
-<template>
-  <div class="container">
-    <div class="forms-container">
-      <div class="signin-signup">
-        <!-- Sign In Form -->
-        <form @submit.prevent="handleLogin" class="sign-in-form">
-          <h2 class="title">Sign in</h2>
-          <div class="input-field">
-            <i class="fas fa-envelope"></i>
-            <input type="email" v-model="loginEmail" placeholder="Email" required />
-          </div>
-          <div class="input-field">
-            <i class="fas fa-lock"></i>
-            <input type="password" v-model="loginPassword" placeholder="Password" required />
-          </div>
-          <div class="form-options">
-            <div class="remember-me">
-              <input type="checkbox" id="remember" />
-              <label for="remember">Remember Me</label>
-            </div>
-            <a href="#" class="forgot-password">Forgot Password?</a>
-          </div>
-          <input type="submit" value="Login" class="btn solid" />
-        </form>
-
-        <!-- Sign Up Form -->
-        <form @submit.prevent="handleRegister" class="sign-up-form">
-          <h2 class="title">Sign up</h2>
-          <div class="input-field">
-            <i class="fas fa-user"></i>
-            <input type="text" v-model="registerData.username" placeholder="Username" required />
-          </div>
-          <div class="input-field">
-            <i class="fas fa-envelope"></i>
-            <input type="email" v-model="registerData.email" placeholder="Email" required />
-          </div>
-          <div class="input-field">
-            <i class="fas fa-lock"></i>
-            <input type="password" v-model="registerData.password" placeholder="Password" required />
-          </div>
-          <div class="input-field">
-            <i class="fas fa-lock"></i>
-            <input type="password" v-model="registerData.confirmPassword" placeholder="Confirm Password" required />
-          </div>
-          <div class="input-field">
-            <i class="fas fa-calendar-alt"></i>
-            <input type="number" v-model="registerData.age" placeholder="Age" required min="4" max="100" />
-          </div>
-          <div class="input-field" v-if="isChild" style="display: block;">
-            <i class="fas fa-envelope"></i>
-            <input type="email" v-model="registerData.parentEmail" placeholder="Parent's Email" />
-          </div>
-          <input type="submit" class="btn" value="Sign up" />
-        </form>
-      </div>
-    </div>
-
-    <div class="panels-container">
-      <!-- Panels for animations -->
-    </div>
-  </div>
-</template>
-
   <style scoped>
   /* Include your styles here */
   @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800&display=swap");
