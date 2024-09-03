@@ -1,17 +1,13 @@
-
 import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';
-import { VuePreloader } from 'vue-preloader';
-// require('dotenv').config(); 
- // Import VuePreloader
+import { VuePreloader } from 'vue-preloader'; // Import VuePreloader
 // Importing CSS libraries globally
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'swiper/swiper-bundle.css';
 import 'glightbox/dist/css/glightbox.min.css';
 import 'aos/dist/aos.css';
-
 
 // Importing JavaScript libraries globally
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
@@ -22,6 +18,7 @@ import AOS from 'aos';
 // Initialize libraries
 AOS.init();
 GLightbox();
+
 const app = createApp(App);
 
 // Register VuePreloader globally

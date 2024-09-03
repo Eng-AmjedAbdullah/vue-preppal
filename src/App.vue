@@ -1,12 +1,20 @@
 <template>
   <div id="app">
-    <HeaderComponent />
+    <!-- Conditionally render HeaderComponent based on the current route -->
+    <HeaderComponent v-if="!isAuthPage" />
+    
+    <!-- Render the current view -->
     <router-view />
-    <FooterComponent />
+    
+    <!-- Conditionally render FooterComponent based on the current route -->
+    <FooterComponent v-if="!isAuthPage" />
+    
     <!-- Scroll to top button -->
     <a href="#" class="scroll-top d-flex align-items-center justify-content-center">
       <i class="bi bi-arrow-up-short"></i>
     </a>
+    
+    <!-- Preloader (optional) -->
     <!-- <div id="preloader">
       <div class="line"></div>
     </div> -->
@@ -14,6 +22,7 @@
 </template>
 
 <script>
+import { useRoute } from 'vue-router'; // Import useRoute to access route info
 import HeaderComponent from './components/HeaderComponent.vue';
 import FooterComponent from './components/FooterComponent.vue';
 
@@ -21,6 +30,12 @@ export default {
   components: {
     HeaderComponent,
     FooterComponent,
+  },
+  setup() {
+    const route = useRoute(); // Use Vue Router's useRoute composition function
+    const isAuthPage = route.name === 'Auth'; // Determine if the current page is the Auth page
+    
+    return { isAuthPage }; // Expose the computed property
   },
   mounted() {
     // Hide preloader after content is ready

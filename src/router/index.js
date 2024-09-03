@@ -1,20 +1,23 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import AuthView from '../views/AuthView.vue';
+import ParentRegisterView from '../views/ParentRegisterView.vue';
+import HomeView from '../views/HomeView.vue'; // Import the new HomeView component
 
 const routes = [
   {
     path: '/',
     name: 'Home',
-    component: () => import('../views/HomeView.vue'), // Lazy load HomeView
+    component: HomeView, // Set HomeView as the default route
   },
   {
     path: '/auth',
     name: 'Auth',
-    component: () => import('../views/AuthView.vue'), // Lazy load AuthView
+    component: AuthView,
   },
   {
     path: '/parent-register',
     name: 'ParentRegister',
-    component: () => import('../views/ParentRegisterView.vue'), // Lazy load ParentRegisterView
+    component: ParentRegisterView,
   },
   {
     path: '/:catchAll(.*)', // Catch-all route for undefined paths
@@ -22,6 +25,7 @@ const routes = [
   },
 ];
 
+// Use `createWebHistory` without base URL argument
 const router = createRouter({
   history: createWebHistory(), // No base URL needed
   routes,
