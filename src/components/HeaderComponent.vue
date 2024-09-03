@@ -33,7 +33,7 @@
               <li><a href="#" @click.prevent="logout">Logout</a></li>
             </ul>
           </li>
-          <li v-else><router-link to="/auth">Login</router-link></li>
+          <li v-else><router-link to="/login">Login</router-link></li>
         </ul>
       </nav>
 

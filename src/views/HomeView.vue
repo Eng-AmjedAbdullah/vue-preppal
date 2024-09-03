@@ -5,7 +5,7 @@
         <div class="col-lg-6 text-center">
           <h2><span>PrepPal</span> - Your Interactive Guide to Emergency Preparedness</h2>
           <p>Embark on a journey of learning and readiness with PrepPal, where we transform emergency preparedness into an engaging experience for all ages. Our platform, powered by advanced AI and technology, offers interactive scenarios, personalized guidance, and inclusive features to ensure everyone is equipped to handle emergencies with confidence.</p>
-          <router-link to="/auth" class="btn-get-started">Join the PrepPal Community</router-link>
+          <router-link to="/login" class="btn-get-started">Join the PrepPal Community</router-link>
         </div>
       </div>
     </div>
