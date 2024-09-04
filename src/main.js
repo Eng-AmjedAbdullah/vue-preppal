@@ -8,6 +8,9 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'swiper/swiper-bundle.css';
 import 'glightbox/dist/css/glightbox.min.css';
 import 'aos/dist/aos.css';
+// main.js
+import '@fortawesome/fontawesome-free/css/all.css';
+import '@fortawesome/fontawesome-free/js/all.js';
 
 // Importing JavaScript libraries globally
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';

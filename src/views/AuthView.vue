@@ -183,7 +183,7 @@ methods: {
   async handleRegister() {
     if (this.registerData.age < 13) {
       // For child users, send parental consent email
-      const verificationLink = `http://localhost:8080/parent-registration?childEmail=${encodeURIComponent(this.registerData.email)}&username=${encodeURIComponent(this.registerData.username)}`;
+      const verificationLink = `https://vue-preppal.web.app/parent-registration?childEmail=${encodeURIComponent(this.registerData.email)}&username=${encodeURIComponent(this.registerData.username)}`;
       try {
         await emailService.sendParentalConsentEmail(this.registerData.parentEmail, {
           parent_email: this.registerData.parentEmail,
@@ -291,9 +291,15 @@ mounted() {
 };
 </script>
 <style scoped>
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 .container {
-  width: 100vw; /* Full viewport width */
-  height: 100vh; /* Full viewport height */
+  min-width: 100vw; /* Full viewport width */
+  min-height: 100vh; /* Full viewport height */
   justify-content: center;
   align-items: center;
   margin: 0; /* Remove any default margin */
@@ -302,11 +308,7 @@ mounted() {
   background-color: #fff;
   overflow: hidden;
 } 
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
+  
   
   body,
   input {
@@ -320,7 +322,7 @@ mounted() {
   position: relative;
   width: 100%;
   background-color: #fff;
-  min-height: 100vh;
+  height: 100vh;
   overflow: hidden;
 }
   .forms-container {
@@ -762,6 +764,36 @@ mounted() {
   .social-icon:hover {
     color: #4481eb; /* Color change on hover */
     border-color: #4481eb; /* Border color change on hover */
+  }
+  .input-field {
+    max-width: 380px;
+    width: 100%;
+    background-color: #f0f0f0;
+    margin: 10px 0;
+    height: 55px;
+    border-radius: 55px;
+    display: flex; /* Changed from grid to flex for better alignment */
+    align-items: center; /* Center align items vertically */
+    padding: 0 15px; /* Adjusted padding for spacing */
+    position: relative;
+  }
+  
+  .input-field i {
+    margin-right: 10px; /* Space between icon and input */
+    color: #000000;
+    transition: 0.5s;
+    font-size: 1.1rem;
+  }
+  
+  .input-field input {
+    background: none;
+    outline: none;
+    border: none;
+    flex: 1; /* Let the input take the remaining width */
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #333;
+    padding: 10px; /* Adjust padding for better text spacing */
   }
   
   </style>

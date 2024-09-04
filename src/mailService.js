@@ -1,6 +1,7 @@
 // src/emailService.js
 
-import emailjs from 'emailjs-com';
+import emailjs from '@emailjs/browser';
+
 
 // EmailJS configuration
 const serviceID = 'service_ay3nce4';
