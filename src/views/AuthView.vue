@@ -23,16 +23,16 @@
           <input type="submit" value="Login" class="btn solid" />
           <p class="social-text">Or Sign in with social platforms</p>
           <div class="social-media">
-  <a href="#" class="social-icon facebook" @click.prevent="handleSocialLogin('facebook')">
-    <i class="fab fa-facebook-f"></i>
-  </a>
-  <a href="#" class="social-icon google" @click.prevent="handleSocialLogin('google')">
-    <i class="fab fa-google"></i>
-  </a>
-  <a href="#" class="social-icon apple" @click.prevent="handleSocialLogin('apple')">
-    <i class="fab fa-apple"></i>
-  </a>
-</div>
+            <a href="#" class="social-icon facebook" @click.prevent="handleSocialLogin('facebook')">
+              <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="#" class="social-icon google" @click.prevent="handleSocialLogin('google')">
+              <i class="fab fa-google"></i>
+            </a>
+            <a href="#" class="social-icon apple" @click.prevent="handleSocialLogin('apple')">
+              <i class="fab fa-apple"></i>
+            </a>
+          </div>
         </form>
 
         <!-- Sign Up Form -->
@@ -96,16 +96,15 @@
 </template>
 
 <script>
-import { auth } from '../firebase'; // Import Firebase configuration
+import { auth, googleProvider, facebookProvider, appleProvider, db } from '../firebase'; // Import Firebase configuration
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
   signInWithPopup,
-  GoogleAuthProvider,
-  FacebookAuthProvider,
-  OAuthProvider
+  updateProfile
 } from 'firebase/auth';
+import { doc, setDoc, getDoc } from 'firebase/firestore'; // Import Firestore methods
 import emailjs from 'emailjs-com'; // Import EmailJS
 
 // EmailJS configuration constants
@@ -198,7 +197,18 @@ export default {
       } else {
         // For regular users, proceed with registration
         try {
-          await createUserWithEmailAndPassword(auth, this.registerData.email, this.registerData.password);
+          const userCredential = await createUserWithEmailAndPassword(auth, this.registerData.email, this.registerData.password);
+          const user = userCredential.user;
+
+          // Store user data in Firestore
+          await setDoc(doc(db, 'users', user.uid), {
+            username: this.registerData.username,
+            email: this.registerData.email,
+            age: this.registerData.age,
+            parentEmail: this.registerData.parentEmail,
+            isParentApproved: this.registerData.age >= 13 // Automatically true for users 13 or older
+          });
+
           alert('Registration successful! Redirecting to your dashboard...');
           await emailService.sendRegistrationSuccessEmail(this.registerData.email, this.registerData.username);
           // Redirect to dashboard or another action
@@ -221,18 +231,36 @@ export default {
     async handleSocialLogin(providerName) {
       let provider;
       if (providerName === 'google') {
-        provider = new GoogleAuthProvider();
+        provider = googleProvider;
       } else if (providerName === 'facebook') {
-        provider = new FacebookAuthProvider();
+        provider = facebookProvider;
       } else if (providerName === 'apple') {
-        provider = new OAuthProvider('apple.com');
+        provider = appleProvider;
       }
 
       try {
         const result = await signInWithPopup(auth, provider);
-        console.log('User signed in with ' + providerName + ':', result.user);
-        alert('Login successful with ' + providerName + '!');
-        // Redirect to dashboard or another action
+        const user = result.user;
+
+        // Check if user data is complete
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDoc = await getDoc(userDocRef);
+
+        if (!userDoc.exists()) {
+          // If the user document doesn't exist, it means user data is incomplete
+          alert('Please complete your registration details.');
+          this.$router.push('/complete-registration'); // Redirect to a route where they can complete registration
+        } else {
+          const userData = userDoc.data();
+          if (!userData.age || (userData.age < 13 && !userData.isParentApproved)) {
+            alert('Please complete your registration details.');
+            this.$router.push('/complete-registration'); // Redirect to a route where they can complete registration
+          } else {
+            alert('Login successful with ' + providerName + '!');
+            // Redirect to dashboard or another action
+          }
+        }
+
       } catch (error) {
         console.error('Social login failed:', error);
         alert('Social login failed. Please try again.');
