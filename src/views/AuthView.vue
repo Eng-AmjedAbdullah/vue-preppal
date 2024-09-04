@@ -308,16 +308,12 @@ mounted() {
   background-color: #fff;
   overflow: hidden;
 } 
-  
-  
   body,
   input {
     font-family: "Poppins", sans-serif;
     margin: 0;
     padding: 0;
   }
-  
- 
   .container {
   position: relative;
   width: 100%;
