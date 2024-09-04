@@ -1,13 +1,13 @@
 <template>
   <div id="app">
     <!-- Conditionally render HeaderComponent based on the current route -->
-    <HeaderComponent v-if="!isAuthPage" />
+   
     
     <!-- Render the current view -->
     <router-view />
     
     <!-- Conditionally render FooterComponent based on the current route -->
-    <FooterComponent v-if="!isAuthPage" />
+   
     
     <!-- Scroll to top button -->
     <a href="#" class="scroll-top d-flex align-items-center justify-content-center">

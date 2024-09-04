@@ -1,19 +1,23 @@
 <template>
+  <HeaderComponent/>
   <section id="hero" class="hero d-flex flex-column justify-content-center align-items-center" data-aos="fade" data-aos-delay="1500">
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-lg-6 text-center">
           <h2><span>PrepPal</span> - Your Interactive Guide to Emergency Preparedness</h2>
           <p>Embark on a journey of learning and readiness with PrepPal, where we transform emergency preparedness into an engaging experience for all ages. Our platform, powered by advanced AI and technology, offers interactive scenarios, personalized guidance, and inclusive features to ensure everyone is equipped to handle emergencies with confidence.</p>
-          <router-link to="/login" class="btn-get-started">Join the PrepPal Community</router-link>
+          <router-link to="/auth" class="btn-get-started">Join the PrepPal Community</router-link>
         </div>
       </div>
     </div>
   </section>
+  <FooterComponent />
 </template>
 
 <script setup>
-// No script logic needed for the home view
+// Import components using script setup syntax
+import HeaderComponent from '../components/HeaderComponent.vue';
+import FooterComponent from '../components/FooterComponent.vue';
 </script>
 
 <style scoped>

@@ -9,6 +9,7 @@
       <nav id="navbar" class="navbar">
         <ul>
           <li><router-link to="/" class="active">Home</router-link></li>
+          <li><router-link to="/" class="active">Games</router-link></li>
           <li class="dropdown">
             <a href="#"><span>Educational Modules</span> <i class="bi bi-chevron-down dropdown-indicator"></i></a>
             <ul>
@@ -33,7 +34,7 @@
               <li><a href="#" @click.prevent="logout">Logout</a></li>
             </ul>
           </li>
-          <li v-else><router-link to="/login">Login</router-link></li>
+          <li v-else><router-link to="/auth">Login</router-link></li>
         </ul>
       </nav>
 

@@ -10,7 +10,6 @@
     </div>
   </footer>
 </template>
-
 <script setup>
   // No script logic needed for footer
 </script>
@@ -28,9 +27,6 @@
   --color-primary: #27a776;
   --color-secondary: #161718;
 }
-
-
-
 .footer .credits {
   padding-top: 6px;
   text-align: center;
