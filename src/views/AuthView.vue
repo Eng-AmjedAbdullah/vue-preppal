@@ -212,6 +212,7 @@ export default {
           alert('Registration successful! Redirecting to your dashboard...');
           await emailService.sendRegistrationSuccessEmail(this.registerData.email, this.registerData.username);
           // Redirect to dashboard or another action
+          this.$router.push('/dashboard'); // Adjust the route to your dashboard or main page
         } catch (error) {
           console.error('Registration failed:', error);
           alert('Registration failed. Please try again.');
@@ -223,6 +224,7 @@ export default {
         await signInWithEmailAndPassword(auth, this.loginEmail, this.loginPassword);
         alert('Login successful!');
         // Redirect to dashboard or another action
+        this.$router.push('/dashboard'); // Adjust the route to your dashboard or main page
       } catch (error) {
         console.error('Login failed:', error);
         alert('Login failed. Please check your credentials and try again.');
@@ -258,6 +260,7 @@ export default {
           } else {
             alert('Login successful with ' + providerName + '!');
             // Redirect to dashboard or another action
+            this.$router.push('/dashboard'); // Adjust the route to your dashboard or main page
           }
         }
 
@@ -287,6 +290,7 @@ export default {
   },
 };
 </script>
+
 
 
 
