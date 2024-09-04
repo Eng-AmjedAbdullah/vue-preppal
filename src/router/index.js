@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import AuthView from '../views/AuthView.vue';
-import ParentRegisterView from '../views/ParentRegisterView.vue';
-import HomeView from '../views/HomeView.vue'; // Import the new HomeView component
+import ParentRegisterView from '../views/ParentRegistration.vue';
+import HomeView from '../views/HomeView.vue'; // Import the HomeView component
 
 const routes = [
   {
@@ -15,9 +15,9 @@ const routes = [
     component: AuthView,
   },
   {
-    path: '/parent-register',
-    name: 'ParentRegister',
-    component: ParentRegisterView,
+    path: '/parent-registration', // Corrected the path and removed the typo
+    name: 'ParentRegistration', // Corrected the route name and removed the trailing dot
+    component: ParentRegisterView, // Correctly reference the ParentRegistration component
   },
   {
     path: '/:catchAll(.*)', // Catch-all route for undefined paths
@@ -25,7 +25,7 @@ const routes = [
   },
 ];
 
-// Use `createWebHistory` without base URL argument
+// Create a router instance using `createWebHistory`
 const router = createRouter({
   history: createWebHistory(), // No base URL needed
   routes,

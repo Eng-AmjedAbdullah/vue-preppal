@@ -23,16 +23,16 @@
           <input type="submit" value="Login" class="btn solid" />
           <p class="social-text">Or Sign in with social platforms</p>
           <div class="social-media">
-  <a href="#" class="social-icon facebook" @click.prevent="handleSocialLogin('facebook')">
-    <i class="fab fa-facebook-f"></i>
-  </a>
-  <a href="#" class="social-icon google" @click.prevent="handleSocialLogin('google')">
-    <i class="fab fa-google"></i>
-  </a>
-  <a href="#" class="social-icon apple" @click.prevent="handleSocialLogin('apple')">
-    <i class="fab fa-apple"></i>
-  </a>
-</div>
+            <a href="#" class="social-icon facebook" @click.prevent="handleSocialLogin('facebook')">
+              <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="#" class="social-icon google" @click.prevent="handleSocialLogin('google')">
+              <i class="fab fa-google"></i>
+            </a>
+            <a href="#" class="social-icon apple" @click.prevent="handleSocialLogin('apple')">
+              <i class="fab fa-apple"></i>
+            </a>
+          </div>
         </form>
 
         <!-- Sign Up Form -->
@@ -96,16 +96,15 @@
 </template>
 
 <script>
-import { auth } from '../firebase'; // Import Firebase configuration
+import { auth, googleProvider, facebookProvider, appleProvider, db } from '../firebase'; // Import Firebase configuration
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
   signInWithPopup,
-  GoogleAuthProvider,
-  FacebookAuthProvider,
-  OAuthProvider
+  updateProfile
 } from 'firebase/auth';
+import { doc, setDoc, getDoc } from 'firebase/firestore'; // Import Firestore methods
 import emailjs from 'emailjs-com'; // Import EmailJS
 
 // EmailJS configuration constants
@@ -198,7 +197,18 @@ export default {
       } else {
         // For regular users, proceed with registration
         try {
-          await createUserWithEmailAndPassword(auth, this.registerData.email, this.registerData.password);
+          const userCredential = await createUserWithEmailAndPassword(auth, this.registerData.email, this.registerData.password);
+          const user = userCredential.user;
+
+          // Store user data in Firestore
+          await setDoc(doc(db, 'users', user.uid), {
+            username: this.registerData.username,
+            email: this.registerData.email,
+            age: this.registerData.age,
+            parentEmail: this.registerData.parentEmail,
+            isParentApproved: this.registerData.age >= 13 // Automatically true for users 13 or older
+          });
+
           alert('Registration successful! Redirecting to your dashboard...');
           await emailService.sendRegistrationSuccessEmail(this.registerData.email, this.registerData.username);
           // Redirect to dashboard or another action
@@ -221,18 +231,36 @@ export default {
     async handleSocialLogin(providerName) {
       let provider;
       if (providerName === 'google') {
-        provider = new GoogleAuthProvider();
+        provider = googleProvider;
       } else if (providerName === 'facebook') {
-        provider = new FacebookAuthProvider();
+        provider = facebookProvider;
       } else if (providerName === 'apple') {
-        provider = new OAuthProvider('apple.com');
+        provider = appleProvider;
       }
 
       try {
         const result = await signInWithPopup(auth, provider);
-        console.log('User signed in with ' + providerName + ':', result.user);
-        alert('Login successful with ' + providerName + '!');
-        // Redirect to dashboard or another action
+        const user = result.user;
+
+        // Check if user data is complete
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDoc = await getDoc(userDocRef);
+
+        if (!userDoc.exists()) {
+          // If the user document doesn't exist, it means user data is incomplete
+          alert('Please complete your registration details.');
+          this.$router.push('/complete-registration'); // Redirect to a route where they can complete registration
+        } else {
+          const userData = userDoc.data();
+          if (!userData.age || (userData.age < 13 && !userData.isParentApproved)) {
+            alert('Please complete your registration details.');
+            this.$router.push('/complete-registration'); // Redirect to a route where they can complete registration
+          } else {
+            alert('Login successful with ' + providerName + '!');
+            // Redirect to dashboard or another action
+          }
+        }
+
       } catch (error) {
         console.error('Social login failed:', error);
         alert('Social login failed. Please try again.');
@@ -260,20 +288,18 @@ export default {
 };
 </script>
 
+<style scoped>
+/* Your styles here */
+</style>
 
 
 <style scoped>
+/* Styles similar to those in AuthView.vue for consistency */
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-}
-
-body,
-input {
-  font-family: "Poppins", sans-serif;
-  margin: 0;
-  padding: 0;
 }
 
 .container {
@@ -285,6 +311,13 @@ input {
   position: relative;
   background-color: #fff;
   overflow: hidden;
+}
+
+body,
+input {
+  font-family: "Poppins", sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
 .forms-container {
@@ -329,7 +362,6 @@ form.sign-in-form {
 }
 
 .title {
-  font-family: "Poppins", sans-serif;
   font-size: 2.2rem;
   color: #444;
   margin-bottom: 10px;
@@ -364,11 +396,6 @@ form.sign-in-form {
   font-size: 1.1rem;
   color: #333;
   padding: 10px;
-}
-
-.input-field input::placeholder {
-  color: #aaa;
-  font-weight: 500;
 }
 
 .btn {
@@ -521,81 +548,6 @@ form.sign-in-form {
   margin-bottom: 10px;
 }
 
-.forgot-password {
-  color: #4481eb;
-  text-decoration: none;
-  font-size: 0.9rem;
-}
-
-.forgot-password:hover {
-  text-decoration: underline;
-}
-
-.remember-me {
-  display: flex;
-  align-items: center;
-  font-size: 0.9rem;
-}
-
-.remember-me input {
-  margin-right: 5px;
-  color: #4481eb;
-}
-
-.alert {
-  padding: 15px;
-  margin-bottom: 20px;
-  border-radius: 5px;
-  font-size: 1rem;
-  text-align: center;
-  max-width: 700px;
-  margin: 10px auto;
-}
-
-.alert-success {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
-}
-
-.alert-danger {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
-}
-
-.social-text {
-  padding: 0.7rem 0;
-  font-size: 1rem;
-  color: #333;
-}
-
-.social-media {
-  display: flex;
-  justify-content: center;
-  margin-top: 10px;
-}
-
-.social-icon {
-  height: 46px;
-  width: 46px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 0 0.45rem;
-  color: #333;
-  border-radius: 50%;
-  border: 1px solid #333;
-  text-decoration: none;
-  font-size: 1.1rem;
-  transition: 0.3s;
-}
-
-.social-icon:hover {
-  color: #4481eb;
-  border-color: #4481eb;
-}
-
 @media (max-width: 870px) {
   .container {
     min-height: 800px;
@@ -728,4 +680,78 @@ form.sign-in-form {
   }
 }
 
+.forgot-password {
+  color: #4481eb;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.forgot-password:hover {
+  text-decoration: underline;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.remember-me input {
+  margin-right: 5px;
+  color: #4481eb;
+}
+
+.alert {
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  font-size: 1rem;
+  text-align: center;
+  max-width: 700px;
+  margin: 10px auto;
+}
+
+.alert-success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.alert-danger {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.social-text {
+  padding: 0.7rem 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+.social-media {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.social-icon {
+  height: 46px;
+  width: 46px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 0.45rem;
+  color: #333;
+  border-radius: 50%;
+  border: 1px solid #333;
+  text-decoration: none;
+  font-size: 1.1rem;
+  transition: 0.3s;
+}
+
+.social-icon:hover {
+  color: #4481eb;
+  border-color: #4481eb;
+}
 </style>
