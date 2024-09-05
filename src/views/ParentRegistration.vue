@@ -78,17 +78,13 @@ import { auth } from '../firebase'; // Import Firebase configuration
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  sendPasswordResetEmail,
-  signInWithPopup,
-  GoogleAuthProvider,
-  FacebookAuthProvider,
-  OAuthProvider
+  sendPasswordResetEmail
 } from 'firebase/auth';
 import emailjs from 'emailjs-com'; // Import EmailJS
 
 const userID = '156vV7tB4bmBnhXSI'; // Your EmailJS user ID
 const serviceID = 'service_ay3nce4'; // Your EmailJS service ID
-const templateIDParentSuccess = 'template_parent_success'; // Template ID for notifying child after parent registration
+const templateIDParentSuccess = 'template_dcy2p5j'; // Template ID for notifying child after parent registration
 
 const emailService = {
   async sendParentRegistrationSuccessEmail(childEmail, parentName) {
@@ -123,11 +119,19 @@ export default {
   methods: {
     async handleParentRegister() {
       try {
+        if (this.parentRegisterData.password !== this.parentRegisterData.confirmPassword) {
+          alert("Passwords do not match. Please try again.");
+          return;
+        }
+
         await createUserWithEmailAndPassword(auth, this.parentRegisterData.email, this.parentRegisterData.password);
         alert('Parent registration successful! Now, notifying the child.');
+        
         const childEmail = this.$route.query.childEmail; // Assuming the child email is passed as a query parameter
         await emailService.sendParentRegistrationSuccessEmail(childEmail, this.parentRegisterData.username);
-        // Redirect to login or dashboard after successful parent registration
+        
+        // Redirect to parent login page
+        this.$router.push('/auth'); // Adjust this path if the parent login page is different
       } catch (error) {
         console.error('Parent registration failed:', error);
         alert('Parent registration failed. Please try again.');
@@ -138,7 +142,8 @@ export default {
       try {
         await signInWithEmailAndPassword(auth, this.loginEmail, this.loginPassword);
         alert('Login successful!');
-        // Redirect to dashboard or another action
+        // Redirect to parent dashboard or another action
+        this.$router.push('/parent-dashboard'); // Adjust the route to your parent dashboard page
       } catch (error) {
         console.error('Login failed:', error);
         alert('Login failed. Please check your credentials and try again.');
@@ -168,7 +173,6 @@ export default {
   }
 };
 </script>
-
 <style scoped>
 /* Styles similar to those in AuthView.vue for consistency */
 

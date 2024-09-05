@@ -763,6 +763,62 @@ form.sign-in-form {
     bottom: 28%;
     left: 50%;
   }
+  /* Ensure form inputs are full width on smaller screens */
+@media (max-width: 600px) {
+  .sign-in-form, .sign-up-form {
+    padding: 0 1rem; /* Reduce padding for better fit on smaller screens */
+  }
+
+  .input-field {
+    max-width: 100%; /* Allow input fields to expand fully */
+    width: 100%;
+    margin: 10px 0; /* Provide margin around each input */
+  }
+
+  .input-field input {
+    padding: 12px 15px; /* Adjust padding for better touch response */
+    font-size: 1rem; /* Slightly larger font size for readability */
+  }
+
+  .btn {
+    width: 100%; /* Ensure buttons take full width */
+    padding: 12px; /* Increase padding for better touch experience */
+  }
+
+  /* Adjust the panel and container styles for mobile screens */
+  .panels-container {
+    display: block; /* Stack panels vertically */
+    padding-top: 20px;
+  }
+
+  .panel {
+    padding: 1.5rem 2rem; /* Add padding inside each panel */
+    text-align: center; /* Center text for better alignment */
+  }
+
+  .panel .content h3 {
+    font-size: 1.2rem; /* Reduce header size */
+  }
+
+  .panel .content p {
+    font-size: 0.9rem; /* Reduce paragraph font size */
+    padding: 0.5rem 0;
+  }
+
+  /* Responsive adjustments for buttons inside panels */
+  .btn.transparent {
+    width: 100%;
+    margin-top: 15px;
+    padding: 10px 0;
+    font-size: 0.9rem; /* Adjust font size for smaller screens */
+  }
+
+  /* Hide or adjust the hero images for better mobile experience */
+  .image {
+    display: none; /* Hide large images on smaller screens */
+  }
+}
+
 }
 
 </style>

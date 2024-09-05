@@ -1,13 +1,16 @@
+// src/router/index.js
+
 import { createRouter, createWebHistory } from 'vue-router';
+import HomeView from '../views/HomeView.vue';
 import AuthView from '../views/AuthView.vue';
 import ParentRegisterView from '../views/ParentRegistration.vue';
-import HomeView from '../views/HomeView.vue'; // Import the HomeView component
+import ParentDashboard from '../views/ParentDashboard.vue'; // Import the new component
 
 const routes = [
   {
     path: '/',
     name: 'Home',
-    component: HomeView, // Set HomeView as the default route
+    component: HomeView,
   },
   {
     path: '/auth',
@@ -15,9 +18,14 @@ const routes = [
     component: AuthView,
   },
   {
-    path: '/parent-registration', // Corrected the path and removed the typo
-    name: 'ParentRegistration', // Corrected the route name and removed the trailing dot
-    component: ParentRegisterView, // Correctly reference the ParentRegistration component
+    path: '/parent-registration',
+    name: 'ParentRegistration',
+    component: ParentRegisterView,
+  },
+  {
+    path: '/parent-dashboard', // Define the route path
+    name: 'ParentDashboard',   // Name the route
+    component: ParentDashboard, // Specify the component to render
   },
   {
     path: '/:catchAll(.*)', // Catch-all route for undefined paths
@@ -25,9 +33,8 @@ const routes = [
   },
 ];
 
-// Create a router instance using `createWebHistory`
 const router = createRouter({
-  history: createWebHistory(), // No base URL needed
+  history: createWebHistory(),
   routes,
 });
 
