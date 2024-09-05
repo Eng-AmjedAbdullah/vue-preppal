@@ -107,18 +107,19 @@ import {
 import { doc, setDoc, getDoc } from 'firebase/firestore'; // Import Firestore methods
 import emailjs from 'emailjs-com'; // Import EmailJS
 
+// Initialize EmailJS only once
+emailjs.init('156vV7tB4bmBnhXSI'); // Your EmailJS user ID
+
 // EmailJS configuration constants
 const serviceID = 'service_ay3nce4';
 const templateIDConsent = 'template_y8zghha';  // Parental consent email template ID
 const templateIDReset = 'template_reset_password'; // Reset password email template ID
 const templateIDSuccess = 'template_dcy2p5j'; // Child registration success email template ID
-const userID = '156vV7tB4bmBnhXSI';
 
 // Email service object for sending emails via EmailJS
 const emailService = {
   async sendParentalConsentEmail(parentEmail, templateParams) {
     try {
-      emailjs.init(userID);
       await emailjs.send(serviceID, templateIDConsent, templateParams);
       console.log('Parental consent email sent successfully!');
       alert('An email has been sent to your parent for consent. Please wait for approval.');
@@ -129,7 +130,6 @@ const emailService = {
   },
   async sendRegistrationSuccessEmail(childEmail, username) {
     try {
-      emailjs.init(userID);
       await emailjs.send(serviceID, templateIDSuccess, {
         to_email: childEmail,
         username: username,
@@ -142,7 +142,6 @@ const emailService = {
   },
   async sendResetPasswordEmail(email) {
     try {
-      emailjs.init(userID);
       await emailjs.send(serviceID, templateIDReset, {
         to_email: email
       });
@@ -294,10 +293,6 @@ export default {
   },
 };
 </script>
-
-
-
-
 
 <style scoped>
 * {

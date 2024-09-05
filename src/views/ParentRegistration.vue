@@ -74,29 +74,29 @@
 </template>
 
 <script>
-import { auth } from '../firebase'; // Import Firebase configuration
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  sendPasswordResetEmail
-} from 'firebase/auth';
+import { auth, db } from '../firebase'; // Import Firebase configuration
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore'; // Import Firestore methods
 import emailjs from 'emailjs-com'; // Import EmailJS
 
-const userID = '156vV7tB4bmBnhXSI'; // Your EmailJS user ID
-const serviceID = 'service_ay3nce4'; // Your EmailJS service ID
-const templateIDParentSuccess = 'template_dcy2p5j'; // Template ID for notifying child after parent registration
+// Initialize EmailJS once
+emailjs.init('156vV7tB4bmBnhXSI'); // Your EmailJS user ID
 
+// EmailJS configuration constants
+const serviceID = 'service_ay3nce4';
+const templateIDChildSuccess = 'template_dcy2p5j'; // Child registration success email template ID
+
+// Email service object for sending emails via EmailJS
 const emailService = {
-  async sendParentRegistrationSuccessEmail(childEmail, parentName) {
+  async sendChildSuccessEmail(childEmail, parentName) {
     try {
-      emailjs.init(userID);
-      await emailjs.send(serviceID, templateIDParentSuccess, {
+      await emailjs.send(serviceID, templateIDChildSuccess, {
         to_email: childEmail,
         parent_name: parentName,
       });
-      console.log('Parent registration success email sent to child!');
+      console.log('Child success email sent to child!');
     } catch (error) {
-      console.error('Failed to send parent registration success email:', error);
+      console.error('Failed to send child success email:', error);
       alert('Failed to notify the child after parent registration.');
     }
   }
@@ -106,73 +106,55 @@ export default {
   name: 'ParentRegistrationPage',
   data() {
     return {
-      loginEmail: '',
-      loginPassword: '',
-      parentRegisterData: {
+      registerData: {
         username: '',
         email: '',
         password: '',
-        confirmPassword: ''
+        confirmPassword: '',
+        childEmail: this.$route.query.childEmail || '', // Assume child email is passed as query parameter
       }
     };
   },
   methods: {
     async handleParentRegister() {
-      try {
-        if (this.parentRegisterData.password !== this.parentRegisterData.confirmPassword) {
-          alert("Passwords do not match. Please try again.");
-          return;
-        }
-
-        await createUserWithEmailAndPassword(auth, this.parentRegisterData.email, this.parentRegisterData.password);
-        alert('Parent registration successful! Now, notifying the child.');
-        
-        const childEmail = this.$route.query.childEmail; // Assuming the child email is passed as a query parameter
-        await emailService.sendParentRegistrationSuccessEmail(childEmail, this.parentRegisterData.username);
-        
-        // Redirect to parent login page
-        this.$router.push('/auth'); // Adjust this path if the parent login page is different
-      } catch (error) {
-        console.error('Parent registration failed:', error);
-        alert('Parent registration failed. Please try again.');
-      }
-    },
-
-    async handleLogin() {
-      try {
-        await signInWithEmailAndPassword(auth, this.loginEmail, this.loginPassword);
-        alert('Login successful!');
-        // Redirect to parent dashboard or another action
-        this.$router.push('/parent-dashboard'); // Adjust the route to your parent dashboard page
-      } catch (error) {
-        console.error('Login failed:', error);
-        alert('Login failed. Please check your credentials and try again.');
-      }
-    },
-
-    async handleForgotPassword() {
-      if (!this.loginEmail) {
-        alert('Please enter your email address.');
+      // Validate the form input
+      if (this.registerData.password !== this.registerData.confirmPassword) {
+        alert("Passwords do not match. Please try again.");
         return;
       }
 
       try {
-        await sendPasswordResetEmail(auth, this.loginEmail);
-        console.log('Reset password email sent successfully!');
-        alert('Check your email to reset your password.');
-      } catch (error) {
-        console.error('Failed to send reset password email:', error);
-        alert('Failed to send reset password email. Please try again.');
-      }
-    },
+        // Register parent in Firebase Authentication
+        const userCredential = await createUserWithEmailAndPassword(auth, this.registerData.email, this.registerData.password);
+        const user = userCredential.user;
 
-    toggleMode() {
-      const container = document.querySelector('.container');
-      container.classList.toggle('sign-up-mode');
+        // Store parent details in Firestore
+        await setDoc(doc(db, 'parents', user.uid), {
+          username: this.registerData.username,
+          email: this.registerData.email,
+          childEmail: this.registerData.childEmail, // Store child email for reference
+          registrationDate: new Date().toISOString(),
+        });
+
+        alert('Parent registration successful! Notifying the child...');
+
+        // Send success email to the child
+        await emailService.sendChildSuccessEmail(this.registerData.childEmail, this.registerData.username);
+
+        // Redirect to parent login page or another route
+        this.$router.push('/auth'); // Adjust the path to your login or dashboard
+
+      } catch (error) {
+        console.error('Parent registration failed:', error);
+        alert('Parent registration failed. Please try again.');
+      }
     }
   }
 };
 </script>
+
+
+
 <style scoped>
 /* Styles similar to those in AuthView.vue for consistency */
 
