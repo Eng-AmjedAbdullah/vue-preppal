@@ -2,9 +2,9 @@
   <div class="container">
     <div class="forms-container">
       <div class="signin-signup">
-        <!-- Sign In Form -->
+        <!-- Sign In Form for Parent -->
         <form @submit.prevent="handleLogin" class="sign-in-form">
-          <h2 class="title">Sign in</h2>
+          <h2 class="title">Parent Sign in</h2>
           <div class="input-field">
             <i class="fas fa-envelope"></i>
             <input type="email" v-model="loginEmail" placeholder="Email" required />
@@ -21,46 +21,26 @@
             <a href="#" class="forgot-password" @click.prevent="handleForgotPassword">Forgot Password?</a>
           </div>
           <input type="submit" value="Login" class="btn solid" />
-          <p class="social-text">Or Sign in with social platforms</p>
-          <div class="social-media">
-            <a href="#" class="social-icon facebook" @click.prevent="handleSocialLogin('facebook')">
-              <i class="fab fa-facebook-f"></i>
-            </a>
-            <a href="#" class="social-icon google" @click.prevent="handleSocialLogin('google')">
-              <i class="fab fa-google"></i>
-            </a>
-            <a href="#" class="social-icon apple" @click.prevent="handleSocialLogin('apple')">
-              <i class="fab fa-apple"></i>
-            </a>
-          </div>
         </form>
 
-        <!-- Sign Up Form -->
-        <form @submit.prevent="handleRegister" class="sign-up-form">
-          <h2 class="title">Sign up</h2>
+        <!-- Sign Up Form for Parent -->
+        <form @submit.prevent="handleParentRegister" class="sign-up-form">
+          <h2 class="title">Parent Sign up</h2>
           <div class="input-field">
             <i class="fas fa-user"></i>
-            <input type="text" v-model="registerData.username" placeholder="Username" required />
+            <input type="text" v-model="parentRegisterData.username" placeholder="Username" required />
           </div>
           <div class="input-field">
             <i class="fas fa-envelope"></i>
-            <input type="email" v-model="registerData.email" placeholder="Email" required />
+            <input type="email" v-model="parentRegisterData.email" placeholder="Email" required />
           </div>
           <div class="input-field">
             <i class="fas fa-lock"></i>
-            <input type="password" v-model="registerData.password" placeholder="Password" required />
+            <input type="password" v-model="parentRegisterData.password" placeholder="Password" required />
           </div>
           <div class="input-field">
             <i class="fas fa-lock"></i>
-            <input type="password" v-model="registerData.confirmPassword" placeholder="Confirm Password" required />
-          </div>
-          <div class="input-field">
-            <i class="fas fa-calendar-alt"></i>
-            <input type="number" v-model="registerData.age" placeholder="Age" required min="4" max="100" @input="handleAgeInput" />
-          </div>
-          <div class="input-field" v-if="isChild">
-            <i class="fas fa-envelope"></i>
-            <input type="email" v-model="registerData.parentEmail" placeholder="Parent's Email" :required="isChild" />
+            <input type="password" v-model="parentRegisterData.confirmPassword" placeholder="Confirm Password" required />
           </div>
           <input type="submit" class="btn" value="Sign up" />
         </form>
@@ -73,8 +53,7 @@
         <div class="content">
           <h3>New here?</h3>
           <p>
-            Ready to empower yourself and your loved ones with knowledge?
-            Sign up now and start learning how to stay safe in any emergency.
+            Sign up as a parent to approve your child's registration and monitor their activity.
           </p>
           <button class="btn transparent" id="sign-up-btn" @click="toggleMode">Sign up</button>
         </div>
@@ -82,10 +61,9 @@
       </div>
       <div class="panel right-panel">
         <div class="content">
-          <h3>Already part of the PrePal family?</h3>
+          <h3>Already have an account?</h3>
           <p>
-            Welcome back! Sign in to continue your journey towards becoming a preparedness pro.
-            Your safety adventure awaits!
+            Sign in to approve your child's registration or monitor their activity.
           </p>
           <button class="btn transparent" id="sign-in-btn" @click="toggleMode">Sign in</button>
         </div>
@@ -96,128 +74,66 @@
 </template>
 
 <script>
-import { auth, googleProvider, facebookProvider, appleProvider, db } from '../firebase'; // Import Firebase configuration
+import { auth } from '../firebase'; // Import Firebase configuration
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
   signInWithPopup,
-  updateProfile
+  GoogleAuthProvider,
+  FacebookAuthProvider,
+  OAuthProvider
 } from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore'; // Import Firestore methods
 import emailjs from 'emailjs-com'; // Import EmailJS
 
-// EmailJS configuration constants
-const serviceID = 'service_ay3nce4';
-const templateIDConsent = 'template_y8zghha';  // Parental consent email template ID
-const templateIDReset = 'template_reset_password'; // Reset password email template ID
-const templateIDSuccess = 'template_dcy2p5j'; // Child registration success email template ID
-const userID = '156vV7tB4bmBnhXSI';
+const userID = '156vV7tB4bmBnhXSI'; // Your EmailJS user ID
+const serviceID = 'service_ay3nce4'; // Your EmailJS service ID
+const templateIDParentSuccess = 'template_parent_success'; // Template ID for notifying child after parent registration
 
-// Email service object for sending emails via EmailJS
 const emailService = {
-  async sendParentalConsentEmail(parentEmail, templateParams) {
+  async sendParentRegistrationSuccessEmail(childEmail, parentName) {
     try {
       emailjs.init(userID);
-      await emailjs.send(serviceID, templateIDConsent, templateParams);
-      console.log('Parental consent email sent successfully!');
-      alert('An email has been sent to your parent for consent. Please wait for approval.');
-    } catch (error) {
-      console.error('Failed to send parental consent email:', error);
-      alert('Failed to send parental consent email. Please try again.');
-    }
-  },
-  async sendRegistrationSuccessEmail(childEmail, username) {
-    try {
-      emailjs.init(userID);
-      await emailjs.send(serviceID, templateIDSuccess, {
+      await emailjs.send(serviceID, templateIDParentSuccess, {
         to_email: childEmail,
-        username: username,
+        parent_name: parentName,
       });
-      console.log('Child registration success email sent!');
+      console.log('Parent registration success email sent to child!');
     } catch (error) {
-      console.error('Failed to send child registration success email:', error);
-      alert('Failed to send registration success email.');
-    }
-  },
-  async sendResetPasswordEmail(email) {
-    try {
-      emailjs.init(userID);
-      await emailjs.send(serviceID, templateIDReset, {
-        to_email: email
-      });
-      console.log('Reset password email sent successfully!');
-      alert('Check your email to reset your password.');
-    } catch (error) {
-      console.error('Failed to send reset password email:', error);
-      alert('Failed to send reset password email. Please try again.');
+      console.error('Failed to send parent registration success email:', error);
+      alert('Failed to notify the child after parent registration.');
     }
   }
 };
 
 export default {
-  name: 'AuthPage',
+  name: 'ParentRegistrationPage',
   data() {
     return {
       loginEmail: '',
       loginPassword: '',
-      registerData: {
+      parentRegisterData: {
         username: '',
         email: '',
         password: '',
-        confirmPassword: '',
-        age: null,
-        parentEmail: ''
-      },
-      isChild: false
+        confirmPassword: ''
+      }
     };
   },
-  watch: {
-    'registerData.age'(newVal) {
-      this.isChild = newVal < 13;
-    }
-  },
   methods: {
-    handleAgeInput() {
-      this.isChild = this.registerData.age < 13;
-    },
-    async handleRegister() {
-      if (this.registerData.age < 13) {
-        // For child users, send parental consent email
-        const verificationLink = `https://vue-preppal.web.app/parent-registration?childEmail=${encodeURIComponent(this.registerData.email)}&username=${encodeURIComponent(this.registerData.username)}`;
-        try {
-          await emailService.sendParentalConsentEmail(this.registerData.parentEmail, {
-            parent_email: this.registerData.parentEmail,
-            verificationLink: verificationLink,
-          });
-        } catch (error) {
-          console.error('Failed to send parental consent email:', error);
-          alert('Failed to send parental consent email. Please try again.');
-        }
-      } else {
-        // For regular users, proceed with registration
-        try {
-          const userCredential = await createUserWithEmailAndPassword(auth, this.registerData.email, this.registerData.password);
-          const user = userCredential.user;
-
-          // Store user data in Firestore
-          await setDoc(doc(db, 'users', user.uid), {
-            username: this.registerData.username,
-            email: this.registerData.email,
-            age: this.registerData.age,
-            parentEmail: this.registerData.parentEmail,
-            isParentApproved: this.registerData.age >= 13 // Automatically true for users 13 or older
-          });
-
-          alert('Registration successful! Redirecting to your dashboard...');
-          await emailService.sendRegistrationSuccessEmail(this.registerData.email, this.registerData.username);
-          // Redirect to dashboard or another action
-        } catch (error) {
-          console.error('Registration failed:', error);
-          alert('Registration failed. Please try again.');
-        }
+    async handleParentRegister() {
+      try {
+        await createUserWithEmailAndPassword(auth, this.parentRegisterData.email, this.parentRegisterData.password);
+        alert('Parent registration successful! Now, notifying the child.');
+        const childEmail = this.$route.query.childEmail; // Assuming the child email is passed as a query parameter
+        await emailService.sendParentRegistrationSuccessEmail(childEmail, this.parentRegisterData.username);
+        // Redirect to login or dashboard after successful parent registration
+      } catch (error) {
+        console.error('Parent registration failed:', error);
+        alert('Parent registration failed. Please try again.');
       }
     },
+
     async handleLogin() {
       try {
         await signInWithEmailAndPassword(auth, this.loginEmail, this.loginPassword);
@@ -228,44 +144,7 @@ export default {
         alert('Login failed. Please check your credentials and try again.');
       }
     },
-    async handleSocialLogin(providerName) {
-      let provider;
-      if (providerName === 'google') {
-        provider = googleProvider;
-      } else if (providerName === 'facebook') {
-        provider = facebookProvider;
-      } else if (providerName === 'apple') {
-        provider = appleProvider;
-      }
 
-      try {
-        const result = await signInWithPopup(auth, provider);
-        const user = result.user;
-
-        // Check if user data is complete
-        const userDocRef = doc(db, 'users', user.uid);
-        const userDoc = await getDoc(userDocRef);
-
-        if (!userDoc.exists()) {
-          // If the user document doesn't exist, it means user data is incomplete
-          alert('Please complete your registration details.');
-          this.$router.push('/complete-registration'); // Redirect to a route where they can complete registration
-        } else {
-          const userData = userDoc.data();
-          if (!userData.age || (userData.age < 13 && !userData.isParentApproved)) {
-            alert('Please complete your registration details.');
-            this.$router.push('/complete-registration'); // Redirect to a route where they can complete registration
-          } else {
-            alert('Login successful with ' + providerName + '!');
-            // Redirect to dashboard or another action
-          }
-        }
-
-      } catch (error) {
-        console.error('Social login failed:', error);
-        alert('Social login failed. Please try again.');
-      }
-    },
     async handleForgotPassword() {
       if (!this.loginEmail) {
         alert('Please enter your email address.');
@@ -274,24 +153,21 @@ export default {
 
       try {
         await sendPasswordResetEmail(auth, this.loginEmail);
-        await emailService.sendResetPasswordEmail(this.loginEmail);
+        console.log('Reset password email sent successfully!');
+        alert('Check your email to reset your password.');
       } catch (error) {
-        console.error('Error sending reset password email:', error);
+        console.error('Failed to send reset password email:', error);
         alert('Failed to send reset password email. Please try again.');
       }
     },
+
     toggleMode() {
       const container = document.querySelector('.container');
       container.classList.toggle('sign-up-mode');
     }
-  },
+  }
 };
 </script>
-
-<style scoped>
-/* Your styles here */
-</style>
-
 
 <style scoped>
 /* Styles similar to those in AuthView.vue for consistency */

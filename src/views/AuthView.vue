@@ -190,6 +190,10 @@ export default {
             parent_email: this.registerData.parentEmail,
             verificationLink: verificationLink,
           });
+          alert('Please ask your parent to check their email for approval.');
+          
+          // Redirect to parent registration page
+          this.$router.push('/parent-registration');
         } catch (error) {
           console.error('Failed to send parental consent email:', error);
           alert('Failed to send parental consent email. Please try again.');
@@ -290,6 +294,7 @@ export default {
   },
 };
 </script>
+
 
 
 
