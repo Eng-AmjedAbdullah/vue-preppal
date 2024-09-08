@@ -1,5 +1,5 @@
 <template>
-  <header id="header" class="header d-flex align-items-center fixed-top">
+  <header id="header"  class="header d-flex align-items-center fixed-top">
     <div class="container-fluid d-flex align-items-center justify-content-between">
       <router-link to="/" class="logo d-flex align-items-center me-auto me-lg-0">
         <img :src="logo" alt="Logo" width="50" height="50" />
@@ -10,7 +10,7 @@
       <nav id="navbar" class="navbar d-none d-lg-flex">
         <ul>
           <li><router-link to="/" class="active">Home</router-link></li>
-          <li><router-link to="/games" class="active">Games</router-link></li>
+          <li><router-link to="/games">Games</router-link></li>
           <li class="dropdown">
             <a href="#"><span>Educational Modules</span> <i class="bi bi-chevron-down dropdown-indicator"></i></a>
             <ul>
@@ -47,7 +47,7 @@
       <nav id="sidebar" class="navbar sidebar" :class="{ 'open': isSidebarOpen }">
         <ul>
           <li><router-link to="/" class="active">Home</router-link></li>
-          <li><router-link to="/games" class="active">Games</router-link></li>
+          <li><router-link to="/games" >Games</router-link></li>
           <li class="dropdown">
             <a href="#"><span>Educational Modules</span> <i class="bi bi-chevron-down dropdown-indicator"></i></a>
             <ul>
@@ -74,14 +74,19 @@
           </li>
           <li v-else><router-link to="/auth">Login</router-link></li>
         </ul>
+        <div class="header-social-links ">
+          <a href="#" class="twitter"><i class="bi bi-twitter-x"></i></a>
+          <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
+          <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
+        </div>
       </nav>
 
       <!-- Desktop Social Links (Optional) -->
-      <div class="header-social-links d-none d-lg-flex">
-        <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
+      <div class="header-social-links ">
+        <a href="#" class="twitter"><i class="bi bi-twitter-x"></i></a>
         <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
         <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
-        <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
+        
       </div>
     </div>
   </header>
@@ -116,7 +121,8 @@ onMounted(() => {
   transition: all 0.5s;
   z-index: 997;
   padding: 20px;
-  background-color: #000;
+  background-color: rgba(0, 0, 0, 0.05) ;
+  border-bottom: 1px solid rgba(255, 255, 255, .15);
 }
 
 .navbar {
@@ -168,7 +174,7 @@ onMounted(() => {
 }
 
 .header-social-links a:hover {
-  color: #27a776;
+  color: #27a776!important;
 }
 
 @media (max-width: 992px) {
@@ -177,7 +183,8 @@ onMounted(() => {
   }
 
   .mobile-nav-toggle {
-    display: inline; /* Show toggle button on smaller screens */
+    display: inline;
+    order: 3; /* Show toggle button on smaller screens */
   }
 
   .sidebar {

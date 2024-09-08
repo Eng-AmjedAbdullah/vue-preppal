@@ -1,24 +1,22 @@
 import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';
-import { VuePreloader } from 'vue-preloader'; // Import VuePreloader
-// Importing CSS libraries globally
+import { VuePreloader } from 'vue-preloader'; 
+
+// Importing necessary styles and libraries
 import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap-icons/font/bootstrap-icons.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';  // Ensure bootstrap-icons is correctly loaded
 import 'swiper/swiper-bundle.css';
 import 'glightbox/dist/css/glightbox.min.css';
 import 'aos/dist/aos.css';
-// main.js
-import '@fortawesome/fontawesome-free/css/all.css';
+import '@fortawesome/fontawesome-free/css/all.css';  // Ensure FontAwesome styles are correctly loaded
 import '@fortawesome/fontawesome-free/js/all.js';
-
-// Importing JavaScript libraries globally
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import Swiper from 'swiper/bundle';
 import GLightbox from 'glightbox';
 import AOS from 'aos';
 
-// Initialize libraries
+// Initialize AOS and GLightbox
 AOS.init();
 GLightbox();
 
@@ -29,8 +27,8 @@ app.component('VuePreloader', VuePreloader);
 
 app.mixin({
   mounted() {
-    // Initialize Swiper if the container is found
-    if (this.$el.querySelector('.swiper-container')) {
+    // Initialize Swiper if the swiper-container is found
+    if (document.querySelector('.swiper-container')) {
       new Swiper('.swiper-container', {
         navigation: {
           nextEl: '.swiper-button-next',
@@ -45,5 +43,8 @@ app.mixin({
   },
 });
 
+// Use the router
 app.use(router);
+
+// Mount the app
 app.mount('#app');

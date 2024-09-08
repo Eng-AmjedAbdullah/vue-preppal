@@ -1,98 +1,210 @@
+<!-- src/components/ParentDashboardHeader.vue -->
 <template>
-    <ParentDashboardHeader /> <!-- Use the new header here -->
-    <section id="parent-dashboard" class="dashboard">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-12">
-            <h2>Parent Dashboard</h2>
-            <p>Monitor and manage your children's activities on PrepPal.</p>
-            
-            <!-- Children Details Table -->
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th>Child's Name</th>
-                  <th>Age</th>
-                  <th>Email</th>
-                  <th>Registration Date</th>
-                  <th>Last Activity</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="child in childrenList" :key="child.id">
-                  <td>{{ child.name }}</td>
-                  <td>{{ child.age }}</td>
-                  <td>{{ child.email }}</td>
-                  <td>{{ child.registrationDate }}</td>
-                  <td>{{ child.lastActivity }}</td>
-                  <td>
-                    <span :class="['badge', child.status === 'Active' ? 'bg-success' : 'bg-danger']">
-                      {{ child.status }}
-                    </span>
-                  </td>
-                  <td>
-                    <button class="btn btn-info btn-sm" @click="viewChildDetails(child.id)">View Details</button>
-                    <button class="btn btn-danger btn-sm" @click="removeChild(child.id)">Remove</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+  <header class="parent-dashboard-header">
+    <div class="container d-flex align-items-center justify-content-between">
+      <router-link to="/parent-dashboard" class="logo d-flex align-items-center">
+        <img :src="logo" alt="Logo" width="50" height="50" />
+        <h1>PrepPal Parent Dashboard</h1>
+      </router-link>
+
+      <nav class="navbar" :class="{'active': isSidebarOpen}">
+        <ul>
+          <li><router-link to="/parent-dashboard" class="active">Home</router-link></li>
+          <li><router-link to="/parent-dashboard/children">My Children</router-link></li>
+          <li><router-link to="/parent-dashboard/settings">Settings</router-link></li>
+          <li class="dropdown">
+            <a href="#" @click="toggleDropdown">
+              <img :src="parentData.avatar || 'https://via.placeholder.com/50'" class="profile-image" />
+              {{ parentData.username || 'Parent Name' }}
+              <i class="bi bi-chevron-down dropdown-indicator"></i>
+            </a>
+            <ul v-if="isDropdownOpen" class="dropdown-menu">
+              <li><router-link to="/parent-dashboard/profile">Edit Profile</router-link></li>
+              <li><a href="#" @click.prevent="logout">Logout</a></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="header-social-links">
+        <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
+        <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
+        <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
+        <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
       </div>
-    </section>
-    <FooterComponent />
-  </template>
-  
-  <script setup>
-  import { ref, onMounted } from 'vue';
-  import ParentDashboardHeader from '../components/ParentDashboardHeader.vue'; // Import new header component
-  import FooterComponent from '../components/FooterComponent.vue';
-  
-  // Example data, replace with actual data fetched from a database
-  const childrenList = ref([
-    { id: 1, name: 'Ali', age: 10, email: 'ali@example.com', registrationDate: '2024-01-01', lastActivity: '2024-09-01', status: 'Active' },
-    { id: 2, name: 'Sara', age: 8, email: 'sara@example.com', registrationDate: '2024-02-15', lastActivity: '2024-09-03', status: 'Inactive' },
-    { id: 3, name: 'Omar', age: 12, email: 'omar@example.com', registrationDate: '2024-03-20', lastActivity: '2024-09-04', status: 'Active' }
-  ]);
-  
-  function viewChildDetails(childId) {
-    // Logic to display child details
-    alert(`Viewing details for child ID: ${childId}`);
-  }
-  
-  function removeChild(childId) {
-    // Logic to remove child from monitoring
-    if (confirm('Are you sure you want to remove this child?')) {
-      childrenList.value = childrenList.value.filter(child => child.id !== childId);
-    }
-  }
-  
-  // Fetch children data from backend (this is just a placeholder)
-  onMounted(() => {
-    // Fetch children data from your backend and populate childrenList
-  });
-  </script>
-  
-  <style scoped>
-  .dashboard {
+
+      <i @click="toggleSidebar" class="mobile-nav-toggle mobile-nav-show bi bi-list"></i>
+      <i @click="toggleSidebar" class="mobile-nav-toggle mobile-nav-hide d-none bi bi-x"></i>
+    </div>
+  </header>
+</template>
+
+<script setup>
+import { ref } from 'vue';
+import logo from '../assets/logo.png';
+
+const isSidebarOpen = ref(false);
+const isDropdownOpen = ref(false);
+const parentData = ref({
+  username: 'Parent Name',
+  avatar: 'https://via.placeholder.com/50'
+});
+
+// Toggle sidebar for mobile
+function toggleSidebar() {
+  isSidebarOpen.value = !isSidebarOpen.value;
+}
+
+// Toggle dropdown for profile actions
+function toggleDropdown() {
+  isDropdownOpen.value = !isDropdownOpen.value;
+}
+
+// Logout function
+function logout() {
+  // Perform logout operation
+  console.log('User logged out');
+}
+</script>
+
+<style scoped>
+.parent-dashboard-header {
+  width: 100%;
+  padding: 20px 0;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #333;
+}
+
+.logo h1 {
+  font-size: 20px;
+  margin-left: 10px;
+  color: #27a776;
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+}
+
+.navbar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.navbar ul li {
+  margin-right: 20px;
+}
+
+.navbar ul li a {
+  text-decoration: none;
+  color: #333;
+  font-size: 16px;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.navbar ul li a:hover {
+  color: #27a776;
+}
+
+.navbar.active {
+  display: block;
+}
+
+.dropdown {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: 10px;
+  list-style: none;
+  padding: 10px;
+  border-radius: 4px;
+  display: block;
+}
+
+.dropdown-menu li {
+  padding: 5px 0;
+}
+
+.dropdown-menu li a {
+  text-decoration: none;
+  color: #333;
+}
+
+.dropdown-menu li a:hover {
+  color: #27a776;
+}
+
+.profile-image {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.header-social-links a {
+  color: #333;
+  margin-left: 10px;
+  font-size: 18px;
+  transition: color 0.3s;
+}
+
+.header-social-links a:hover {
+  color: #27a776;
+}
+
+.mobile-nav-toggle {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .navbar ul {
+    display: none;
+    flex-direction: column;
+    align-items: flex-start;
+    background-color: #fff;
+    width: 100%;
+    position: absolute;
+    top: 60px;
+    left: 0;
     padding: 20px;
-    background-color: #f8f9fa;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
-  
-  .table {
-    margin-top: 20px;
+
+  .mobile-nav-show {
+    display: inline;
   }
-  
-  .table th, .table td {
-    text-align: center;
+
+  .mobile-nav-hide {
+    display: none;
   }
-  
-  .badge {
-    padding: 5px 10px;
-    font-size: 14px;
+
+  .navbar ul.show {
+    display: flex;
   }
-  </style>
-  
+}
+</style>

@@ -18,6 +18,7 @@
     "emailjs-com": "^3.2.0",
     "firebase": "^10.13.1",
     "glightbox": "^3.3.0",
+    "nprogress": "^0.2.0",
     "swiper": "^11.1.12",
     "vue": "^3.4.37",
     "vue-preloader": "^1.1.4",

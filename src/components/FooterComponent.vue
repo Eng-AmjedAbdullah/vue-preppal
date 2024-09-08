@@ -1,40 +1,60 @@
 <template>
   <footer id="footer" class="footer">
+
     <div class="container">
-      <div class="copyright">
-        &copy; Copyright <strong><span>PrepPal</span></strong>. All Rights Reserved
+      <div class="copyright text-center ">
+        <p>© <span>Copyright</span> <strong class="px-1 sitename">PrepPal-platform</strong> <span>All Rights Reserved</span></p>
+      </div>
+      <div class="social-links d-flex justify-content-center">
+        <a href=""><i class="bi bi-twitter-x"></i></a>
+        <a href=""><i class="bi bi-facebook"></i></a>
+        <a href=""><i class="bi bi-instagram"></i></a>
+        <a href=""><i class="bi bi-linkedin"></i></a>
       </div>
       <div class="credits">
-        Designed by <a href="">Haya Fadeh</a>
+      
+        Designed by <a href="haya">Eng.Haya Fadeh</a>
       </div>
     </div>
+
   </footer>
 </template>
-<script setup>
-  // No script logic needed for footer
+
+<script>
+export default {
+  name: 'FooterComponent',
+};
 </script>
 
 <style scoped>
+/* Footer Styles */
 .footer {
-  margin-top: 30px;
-  padding: 30px 0;
+  padding: 40px 0;
   font-size: 14px;
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-  font-family: var(--font-default);
-  color: var(--color-default);
-  background-color: #000;
-  --color-default: #fafafa;
-  --color-primary: #27a776;
-  --color-secondary: #161718;
+  background-color: rgba(250, 250, 250, 0.05);
 }
-.footer .credits {
-  padding-top: 6px;
+
+.footer .copyright {
   text-align: center;
-  font-size: 13px;
   color: rgba(255, 255, 255, 0.8);
 }
 
-.footer .credits a {
-  color: var(--color-primary);
+.footer .social-links a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0 5px;
+  transition: 0.3s;
+}
+
+.footer .social-links a:hover {
+  color: #27a776;
+  border-color: #27a776;
 }
 </style>

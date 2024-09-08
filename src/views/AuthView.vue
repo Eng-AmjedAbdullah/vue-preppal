@@ -1,33 +1,44 @@
 <template>
   <div class="container">
     <div class="forms-container">
+      
       <div class="signin-signup">
         <!-- Sign In Form -->
         <form @submit.prevent="handleLogin" class="sign-in-form">
+            <!-- Success and Error Alerts -->
+        <div v-if="successMessage" class="alert alert-success">
+          {{ successMessage }}
+        </div>
+        <div v-if="errorMessage" class="alert alert-danger">
+          {{ errorMessage }}
+        </div>
           <h2 class="title">Sign in</h2>
           <div class="input-field">
-            <i class="fas fa-envelope"></i>
+            <i class="fas fa-envelope" style="color:black !important;"></i>
             <input type="email" v-model="loginEmail" placeholder="Email" required />
           </div>
           <div class="input-field">
-            <i class="fas fa-lock"></i>
+            <i class="fas fa-lock" style="color:black !important;"></i>
             <input type="password" v-model="loginPassword" placeholder="Password" required />
           </div>
           <div class="form-options">
             <div class="remember-me">
-              <input type="checkbox" id="remember" />
-              <label for="remember">Remember Me</label>
+              <label class="switch">
+                <input type="checkbox" id="remember">
+                <span class="slider round"></span>
+              </label>
+              <label for="remember" class="remember-label">Remember Me</label>
             </div>
             <a href="#" class="forgot-password" @click.prevent="handleForgotPassword">Forgot Password?</a>
           </div>
           <input type="submit" value="Login" class="btn solid" />
           <p class="social-text">Or Sign in with social platforms</p>
           <div class="social-media">
-            <a href="#" class="social-icon facebook" @click.prevent="handleSocialLogin('facebook')">
-              <i class="fab fa-facebook-f"></i>
-            </a>
             <a href="#" class="social-icon google" @click.prevent="handleSocialLogin('google')">
               <i class="fab fa-google"></i>
+            </a>
+            <a href="#" class="social-icon facebook" @click.prevent="handleSocialLogin('facebook')">
+              <i class="fab fa-facebook-f"></i>
             </a>
             <a href="#" class="social-icon apple" @click.prevent="handleSocialLogin('apple')">
               <i class="fab fa-apple"></i>
@@ -39,30 +50,38 @@
         <form @submit.prevent="handleRegister" class="sign-up-form">
           <h2 class="title">Sign up</h2>
           <div class="input-field">
-            <i class="fas fa-user"></i>
+            <i class="fas fa-user" style="color:black !important;"></i>
             <input type="text" v-model="registerData.username" placeholder="Username" required />
           </div>
           <div class="input-field">
-            <i class="fas fa-envelope"></i>
+            <i class="fas fa-envelope" style="color:black !important;"></i>
             <input type="email" v-model="registerData.email" placeholder="Email" required />
           </div>
           <div class="input-field">
-            <i class="fas fa-lock"></i>
+            <i class="fas fa-lock" style="color:black !important;"></i>
             <input type="password" v-model="registerData.password" placeholder="Password" required />
           </div>
           <div class="input-field">
-            <i class="fas fa-lock"></i>
+            <i class="fas fa-lock" style="color:black !important;"></i>
             <input type="password" v-model="registerData.confirmPassword" placeholder="Confirm Password" required />
           </div>
           <div class="input-field">
-            <i class="fas fa-calendar-alt"></i>
+            <i class="fas fa-calendar-alt" style="color:black !important;"></i>
             <input type="number" v-model="registerData.age" placeholder="Age" required min="4" max="100" @input="handleAgeInput" />
           </div>
           <div class="input-field" v-if="isChild">
-            <i class="fas fa-envelope"></i>
+            <i class="fas fa-envelope" style="color:black !important;"></i>
             <input type="email" v-model="registerData.parentEmail" placeholder="Parent's Email" :required="isChild" />
           </div>
+            
           <input type="submit" class="btn" value="Sign up" />
+          <!-- Success and Error Alerts -->
+        <div v-if="successMessage" class="alert alert-success">
+          {{ successMessage }}
+        </div>
+        <div v-if="errorMessage" class="alert alert-danger">
+          {{ errorMessage }}
+        </div>
         </form>
       </div>
     </div>
@@ -93,39 +112,35 @@
       </div>
     </div>
   </div>
+  
 </template>
 
 <script>
-import { auth, googleProvider, facebookProvider, appleProvider, db } from '../firebase'; // Import Firebase configuration
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  sendPasswordResetEmail,
-  signInWithPopup,
-  updateProfile
-} from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore'; // Import Firestore methods
-import emailjs from 'emailjs-com'; // Import EmailJS
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signInWithPopup } from 'firebase/auth';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { db, googleProvider, facebookProvider, appleProvider } from '../firebase'; // Ensure Firebase providers are imported here
+import emailjs from 'emailjs-com';
 
-// Initialize EmailJS only once
-emailjs.init('156vV7tB4bmBnhXSI'); // Your EmailJS user ID
+// Initialize the Firebase Auth instance
+const auth = getAuth();
 
-// EmailJS configuration constants
 const serviceID = 'service_ay3nce4';
-const templateIDConsent = 'template_y8zghha';  // Parental consent email template ID
-const templateIDReset = 'template_reset_password'; // Reset password email template ID
-const templateIDSuccess = 'template_dcy2p5j'; // Child registration success email template ID
+const templateIDConsent = 'parent_Email2';
+const templateIDSuccess = 'template_dcy2p5j';
+const userID = '156vV7tB4bmBnhXSI';
 
-// Email service object for sending emails via EmailJS
+emailjs.init(userID);
+
 const emailService = {
-  async sendParentalConsentEmail(parentEmail, templateParams) {
+  async sendParentalConsentEmail(parentEmail, verificationLink) {
     try {
-      await emailjs.send(serviceID, templateIDConsent, templateParams);
+      await emailjs.send(serviceID, templateIDConsent, {
+        parent_email: parentEmail,
+        verificationLink: verificationLink,
+      });
       console.log('Parental consent email sent successfully!');
-      alert('An email has been sent to your parent for consent. Please wait for approval.');
     } catch (error) {
       console.error('Failed to send parental consent email:', error);
-      alert('Failed to send parental consent email. Please try again.');
     }
   },
   async sendRegistrationSuccessEmail(childEmail, username) {
@@ -137,19 +152,6 @@ const emailService = {
       console.log('Child registration success email sent!');
     } catch (error) {
       console.error('Failed to send child registration success email:', error);
-      alert('Failed to send registration success email.');
-    }
-  },
-  async sendResetPasswordEmail(email) {
-    try {
-      await emailjs.send(serviceID, templateIDReset, {
-        to_email: email
-      });
-      console.log('Reset password email sent successfully!');
-      alert('Check your email to reset your password.');
-    } catch (error) {
-      console.error('Failed to send reset password email:', error);
-      alert('Failed to send reset password email. Please try again.');
     }
   }
 };
@@ -168,7 +170,9 @@ export default {
         age: null,
         parentEmail: ''
       },
-      isChild: false
+      isChild: false,
+      successMessage: '',
+      errorMessage: '',
     };
   },
   watch: {
@@ -177,134 +181,188 @@ export default {
     }
   },
   methods: {
-    handleAgeInput() {
-      this.isChild = this.registerData.age < 13;
+    showSuccessMessage(message) {
+      this.successMessage = message;
+      setTimeout(() => {
+        this.successMessage = ''; // Clear success message after 1 minute
+      }, 60000);
     },
+    showErrorMessage(message) {
+      this.errorMessage = message;
+      setTimeout(() => {
+        this.errorMessage = ''; // Clear error message after 1 minute
+      }, 60000);
+    },
+
+    // Handle Registration (Child or Adult)
     async handleRegister() {
-      if (this.registerData.age < 13) {
-        // For child users, send parental consent email
-        const verificationLink = `https://vue-preppal.web.app/parent-registration?childEmail=${encodeURIComponent(this.registerData.email)}&username=${encodeURIComponent(this.registerData.username)}`;
-        try {
-          await emailService.sendParentalConsentEmail(this.registerData.parentEmail, {
-            parent_email: this.registerData.parentEmail,
-            verificationLink: verificationLink,
+      if (this.registerData.password !== this.registerData.confirmPassword) {
+        this.showErrorMessage('Passwords do not match.');
+        return;
+      }
+
+      try {
+        // Child Registration
+        if (this.isChild) {
+          const userCredential = await createUserWithEmailAndPassword(auth, this.registerData.email, this.registerData.password);
+          const child = userCredential.user;
+
+          // Save child data to Firestore
+          await setDoc(doc(db, 'users', child.uid), {
+            username: this.registerData.username,
+            email: this.registerData.email,
+            age: this.registerData.age,
+            parentEmail: this.registerData.parentEmail,
+            isParentApproved: false,
           });
-          alert('Please ask your parent to check their email for approval.');
-          
-          // Redirect to parent registration page
-          this.$router.push('/parent-registration');
-        } catch (error) {
-          console.error('Failed to send parental consent email:', error);
-          alert('Failed to send parental consent email. Please try again.');
-        }
-      } else {
-        // For regular users, proceed with registration
-        try {
+
+          // Generate the verification link with the child's UID
+          const verificationLink = `https://vue-preppal.web.app/parent-registration?childUid=${child.uid}&childEmail=${encodeURIComponent(this.registerData.email)}&username=${encodeURIComponent(this.registerData.username)}`;
+
+          // Send verification email to parent
+          await emailService.sendParentalConsentEmail(this.registerData.parentEmail, verificationLink);
+          this.showSuccessMessage('Please ask your parent to check their email for approval.');
+
+        } else {
+          // Adult Registration
           const userCredential = await createUserWithEmailAndPassword(auth, this.registerData.email, this.registerData.password);
           const user = userCredential.user;
 
-          // Store user data in Firestore
+          // Save adult data to Firestore
           await setDoc(doc(db, 'users', user.uid), {
             username: this.registerData.username,
             email: this.registerData.email,
             age: this.registerData.age,
             parentEmail: this.registerData.parentEmail,
-            isParentApproved: this.registerData.age >= 13 // Automatically true for users 13 or older
+            isParentApproved: true, // Adults are automatically approved
           });
 
-          alert('Registration successful! Redirecting to your dashboard...');
-          await emailService.sendRegistrationSuccessEmail(this.registerData.email, this.registerData.username);
-          // Redirect to dashboard or another action
-          this.$router.push('/dashboard'); // Adjust the route to your dashboard or main page
-        } catch (error) {
-          console.error('Registration failed:', error);
-          alert('Registration failed. Please try again.');
+          this.showSuccessMessage('Registration successful! Redirecting to your dashboard...');
         }
+      } catch (error) {
+        this.showErrorMessage('Registration failed. Please try again.');
+        console.error('Error during registration:', error);
       }
     },
+
+    // Handle Login
     async handleLogin() {
       try {
-        await signInWithEmailAndPassword(auth, this.loginEmail, this.loginPassword);
-        alert('Login successful!');
-        // Redirect to dashboard or another action
-        this.$router.push('/dashboard'); // Adjust the route to your dashboard or main page
+        const userCredential = await signInWithEmailAndPassword(auth, this.loginEmail, this.loginPassword);
+        const user = userCredential.user;
+
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDoc = await getDoc(userDocRef);
+
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+
+          if (userData.age < 13 && !userData.isParentApproved) {
+            this.showErrorMessage('Your parent needs to approve your registration.');
+            return;
+          }
+
+          // Redirect based on user role or age
+          if (userData.role === 'parent') {
+            this.showSuccessMessage('Login successful! Redirecting to Parent Dashboard...');
+            this.$router.push('/parent-dashboard');
+          } else if (userData.age < 13) {
+        // Redirect to the HTML page for children in the public folder
+        this.showSuccessMessage('Login successful! Redirecting...');
+        window.location.href = '/kider-1.0.0/index.html';  // Path to the HTML page in the public folder
+      } else {
+        // Ordinary user case (e.g., 13 and older, non-parent)
+        this.showSuccessMessage('Login successful! Redirecting to Dashboard...');
+        this.$router.push('/');
+      }
+        } else {
+          this.showErrorMessage('User data not found.');
+        }
       } catch (error) {
-        console.error('Login failed:', error);
-        alert('Login failed. Please check your credentials and try again.');
+        this.showErrorMessage('Login failed. Please check your credentials.');
+        console.error('Login error:', error);
       }
     },
-    async handleSocialLogin(providerName) {
-      let provider;
-      if (providerName === 'google') {
-        provider = googleProvider;
-      } else if (providerName === 'facebook') {
-        provider = facebookProvider;
-      } else if (providerName === 'apple') {
-        provider = appleProvider;
+
+    // Handle Password Reset
+    async handleForgotPassword() {
+      if (!this.loginEmail) {
+        this.showErrorMessage('Please enter your email address.');
+        return;
       }
+
+      try {
+        // Check if the email exists in Firestore
+        const usersRef = db.collection('users');  // Assuming 'users' is your collection name
+        const querySnapshot = await usersRef.where('email', '==', this.loginEmail).get();
+
+        if (querySnapshot.empty) {
+          this.showErrorMessage('Your account does not exist in our system.');
+          return;
+        }
+
+        // Send password reset email
+        await sendPasswordResetEmail(auth, this.loginEmail);
+        this.showSuccessMessage('Check your email to reset your password.');
+
+      } catch (error) {
+        this.showErrorMessage('Failed to send reset password email. Please try again.');
+        console.error('Error sending password reset email:', error);
+      }
+    },
+
+    // Social login function
+    async handleSocialLogin(providerName, isSignup = false) {
+      let provider;
+      if (providerName === 'google') provider = googleProvider;
+      else if (providerName === 'facebook') provider = facebookProvider;
+      else if (providerName === 'apple') provider = appleProvider;
 
       try {
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
 
-        // Check if user data is complete
         const userDocRef = doc(db, 'users', user.uid);
         const userDoc = await getDoc(userDocRef);
 
         if (!userDoc.exists()) {
-          // If the user document doesn't exist, it means user data is incomplete
-          alert('Please complete your registration details.');
-          this.$router.push('/complete-registration'); // Redirect to a route where they can complete registration
-        } else {
-          const userData = userDoc.data();
-          if (!userData.age || (userData.age < 13 && !userData.isParentApproved)) {
-            alert('Please complete your registration details.');
-            this.$router.push('/complete-registration'); // Redirect to a route where they can complete registration
+          if (isSignup) {
+            this.$router.push({
+              path: '/complete-registration',
+              query: { email: user.email }
+            });
           } else {
-            alert('Login successful with ' + providerName + '!');
-            // Redirect to dashboard or another action
-            this.$router.push('/dashboard'); // Adjust the route to your dashboard or main page
+            this.showErrorMessage('Please complete your registration details.');
+            this.$router.push('/complete-registration');
           }
+        } else {
+          this.showSuccessMessage('Login successful with ' + providerName + '!');
+          this.$router.push('/dashboard');
         }
-
       } catch (error) {
-        console.error('Social login failed:', error);
-        alert('Social login failed. Please try again.');
+        this.showErrorMessage('Social login failed. Please try again.');
+        console.error('Social login error:', error);
       }
     },
-    async handleForgotPassword() {
-      if (!this.loginEmail) {
-        alert('Please enter your email address.');
-        return;
-      }
 
-      try {
-        await sendPasswordResetEmail(auth, this.loginEmail);
-        await emailService.sendResetPasswordEmail(this.loginEmail);
-      } catch (error) {
-        console.error('Error sending reset password email:', error);
-        alert('Failed to send reset password email. Please try again.');
-      }
-    },
     toggleMode() {
       const container = document.querySelector('.container');
       container.classList.toggle('sign-up-mode');
     }
-  },
+  }
 };
 </script>
 
 
-
 <style scoped>
+/* All styles included as requested */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-body,
-input {
+body, input {
   font-family: "Poppins", sans-serif;
   margin: 0;
   padding: 0;
@@ -339,6 +397,7 @@ input {
   display: grid;
   grid-template-columns: 1fr;
   z-index: 5;
+  margin-bottom: 0;
 }
 
 form {
@@ -346,11 +405,12 @@ form {
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  padding: 0rem 5rem;
+  padding: 0rem 3rem;
   transition: all 0.2s 0.7s;
   overflow: hidden;
   grid-column: 1 / 2;
   grid-row: 1 / 2;
+  
 }
 
 form.sign-up-form {
@@ -360,6 +420,7 @@ form.sign-up-form {
 
 form.sign-in-form {
   z-index: 2;
+  margin-bottom: 0;
 }
 
 .title {
@@ -384,7 +445,7 @@ form.sign-in-form {
 
 .input-field i {
   margin-right: 10px;
-  color: #000000;
+  color: #000000 !important;
   transition: 0.5s;
   font-size: 1.1rem;
 }
@@ -395,7 +456,7 @@ form.sign-in-form {
   border: none;
   flex: 1;
   font-weight: 600;
-  font-size: 1.1rem;
+  font-size: 0.9rem;
   color: #333;
   padding: 10px;
 }
@@ -424,6 +485,58 @@ form.sign-in-form {
   background-color: #4d84e2;
 }
 
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 28px;
+  height: 14px;
+  margin-right: 10px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 20px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 10px;
+  width: 10px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #000000;
+}
+
+input:checked + .slider:before {
+  transform: translateX(14px);
+}
+
+.remember-label {
+  font-size: 14px;
+  color: #333;
+  vertical-align: middle;
+}
+
 .panels-container {
   position: absolute;
   height: 100%;
@@ -442,7 +555,8 @@ form.sign-in-form {
   top: -10%;
   right: 48%;
   transform: translateY(-50%);
-  background-image: linear-gradient(-45deg, #4481eb 0%, #04befe 100%);
+  background-color: #4481eb;
+  background-image: linear-gradient(to bottom left, #4481eb, #4481eb);
   transition: 1.8s ease-in-out;
   border-radius: 50%;
   z-index: 6;
@@ -452,6 +566,7 @@ form.sign-in-form {
   width: 70%;
   transition: transform 1.1s ease-in-out;
   transition-delay: 0.4s;
+  display: block;
 }
 
 .panel {
@@ -507,11 +622,26 @@ form.sign-in-form {
   width: 70%;
 }
 
-/* ANIMATION */
-
 .container.sign-up-mode:before {
   transform: translate(100%, -50%);
   right: 52%;
+}
+
+.right-panel .image {
+  width: 250px;
+  height: 250px;
+  margin-right: 40px;
+  margin-top: 20px;
+  transition: transform 1.1s ease-in-out;
+  transition-delay: 0.4s;
+  display: inline-flex;
+}
+
+.left-panel .image {
+  width: 250px;
+  height: 250px;
+  margin-left: 80px;
+  margin-top: 0px;
 }
 
 .container.sign-up-mode .left-panel .image,
@@ -558,7 +688,8 @@ form.sign-in-form {
 .forgot-password {
   color: #4481eb;
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: 13px;
+  font-family: "Poppins", sans-serif;
 }
 
 .forgot-password:hover {
@@ -617,9 +748,9 @@ form.sign-in-form {
   justify-content: center;
   align-items: center;
   margin: 0 0.45rem;
-  color: #333;
+  color: #000000;
   border-radius: 50%;
-  border: 1px solid #333;
+  border: 1px solid #000000;
   text-decoration: none;
   font-size: 1.1rem;
   transition: 0.3s;
@@ -627,7 +758,7 @@ form.sign-in-form {
 
 .social-icon:hover {
   color: #4481eb;
-  border-color: #4481eb;
+  border-color: #000000;
 }
 
 @media (max-width: 870px) {
@@ -743,6 +874,10 @@ form.sign-in-form {
     display: none;
   }
 
+  .right-panel .image {
+    display: none;
+  }
+
   .panel .content {
     padding: 0.5rem 1rem;
   }
@@ -760,62 +895,60 @@ form.sign-in-form {
     bottom: 28%;
     left: 50%;
   }
-  /* Ensure form inputs are full width on smaller screens */
-@media (max-width: 600px) {
-  .sign-in-form, .sign-up-form {
-    padding: 0 1rem; /* Reduce padding for better fit on smaller screens */
-  }
 
-  .input-field {
-    max-width: 100%; /* Allow input fields to expand fully */
-    width: 100%;
-    margin: 10px 0; /* Provide margin around each input */
+  form.sign-up-form .input-field {
+    margin: 7px 0;
+    height: 52px;
+    border-radius: 52;
   }
-
   .input-field input {
-    padding: 12px 15px; /* Adjust padding for better touch response */
-    font-size: 1rem; /* Slightly larger font size for readability */
+    background: none;
+    outline: none;
+    border: none;
+    flex: 1;
+    font-weight: 600;
+    font-size: 0.7rem;
+    color: #333;
+    padding: 10px;
   }
-
-  .btn {
-    width: 100%; /* Ensure buttons take full width */
-    padding: 12px; /* Increase padding for better touch experience */
-  }
-
-  /* Adjust the panel and container styles for mobile screens */
   .panels-container {
-    display: block; /* Stack panels vertically */
-    padding-top: 20px;
+    height: 102%;
   }
 
-  .panel {
-    padding: 1.5rem 2rem; /* Add padding inside each panel */
-    text-align: center; /* Center text for better alignment */
+  
+  .forgot-password {
+    color: #4481eb;
+    text-decoration: none;
+    font-size: 0.7rem;
+    font-family: "Poppins", sans-serif;
+  }
+  
+  .forgot-password:hover {
+    text-decoration: underline;
+  }
+  
+  .remember-me {
+    display: flex;
+    align-items: center;
+    font-size: 0.5rem;
+    font-family: "Poppins", sans-serif;
   }
 
-  .panel .content h3 {
-    font-size: 1.2rem; /* Reduce header size */
-  }
-
-  .panel .content p {
-    font-size: 0.9rem; /* Reduce paragraph font size */
-    padding: 0.5rem 0;
-  }
-
-  /* Responsive adjustments for buttons inside panels */
-  .btn.transparent {
-    width: 100%;
-    margin-top: 15px;
-    padding: 10px 0;
-    font-size: 0.9rem; /* Adjust font size for smaller screens */
-  }
-
-  /* Hide or adjust the hero images for better mobile experience */
-  .image {
-    display: none; /* Hide large images on smaller screens */
-  }
+.remember-label {
+  font-size: 0.7rem;
+  color: #333;
+  vertical-align: middle;
 }
-
+.alert {
+  padding: 5px;
+  margin-bottom: 100px;
+  border-radius: 5px;
+  font-size: 0.7rem;
+  text-align: center;
+  max-width: 700px;
+  margin: 10px auto;
 }
-
+}
 </style>
+
+
